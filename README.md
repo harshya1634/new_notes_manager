@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Smart Student Task & Notes Manager
 
 A Flask and SQLite student productivity web app for managing assignments, notes, calendar deadlines, and reminder alerts in one place.
@@ -38,3 +39,7 @@ python app.py
 # notessss
 students notes manager
 >>>>>>> 34d8af6dfd1e9dcfc5b19b36f2e5a55b13cceebe
+=======
+# new_notes_manager
+student notes manager 
+>>>>>>> 140b8b3772b85dde52cf5302b471713063ddc330
