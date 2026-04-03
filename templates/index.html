@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Student Task & Notes Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+
+    <section class="auth-shell" id="authShell">
+      <aside class="auth-hero panel">
+        <div class="brand-row">
+          <div class="brand-mark">S</div>
+          <div>
+            <p class="eyebrow">Hackathon Project</p>
+            <h1>Smart Student Task & Notes Manager</h1>
+          </div>
+        </div>
+        <p class="hero-copy">
+          Keep assignments, class notes, deadlines, links, and reminders in one secure place.
+          Sign in, track your workload, and use the calendar to plan the week.
+        </p>
+        <div class="hero-actions">
+          <a href="#loginForm">Log in</a>
+          <a href="#registerForm" class="ghost">Create account</a>
+        </div>
+        <div class="hero-card">
+          <span class="hero-label">Demo access</span>
+          <strong>{{ demo_username }} / {{ demo_password }}</strong>
+          <p>Use the demo account immediately or create your own student profile.</p>
+        </div>
+      </aside>
+
+      <article class="auth-card panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Welcome back</p>
+            <h2>Log in</h2>
+          </div>
+        </div>
+        <form id="loginForm" class="form-grid auth-form">
+          <label class="full-span">
+            Username or email
+            <input type="text" name="identifier" placeholder="demo or you@example.com" required />
+          </label>
+          <label class="full-span">
+            Password
+            <input type="password" name="password" placeholder="Your password" required />
+          </label>
+          <p class="form-message full-span" id="loginMessage"></p>
+          <button class="primary-btn full-span" type="submit">Log in</button>
+        </form>
+        <button type="button" class="text-btn" id="forgotToggleBtn">Forgot password?</button>
+        <form id="forgotForm" class="form-grid auth-form hidden">
+          <label class="full-span">
+            Username or email
+            <input type="text" name="identifier" placeholder="Enter your account" required />
+          </label>
+          <div class="full-span helper-row">
+            <button type="button" class="secondary-btn" id="generateCodeBtn">Generate reset code</button>
+            <small>Code is valid for 15 minutes.</small>
+          </div>
+          <label class="full-span">
+            Reset code
+            <input type="text" name="resetCode" placeholder="6-digit code" required />
+          </label>
+          <label class="full-span">
+            New password
+            <input type="password" name="newPassword" placeholder="Minimum 6 characters" required />
+          </label>
+          <p class="form-message full-span" id="forgotMessage"></p>
+          <button class="primary-btn full-span" type="submit">Reset password</button>
+        </form>
+      </article>
+
+      <article class="auth-card panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">New account</p>
+            <h2>Register</h2>
+          </div>
+        </div>
+        <form id="registerForm" class="form-grid auth-form">
+          <label class="full-span">
+            Username
+            <input type="text" name="username" placeholder="yourname" required />
+          </label>
+          <label class="full-span">
+            Email
+            <input type="email" name="email" placeholder="you@example.com" />
+          </label>
+          <label class="full-span">
+            Password
+            <input type="password" name="password" placeholder="Minimum 6 characters" required />
+          </label>
+          <p class="form-message full-span" id="registerMessage"></p>
+          <button class="primary-btn full-span" type="submit">Create account</button>
+        </form>
+      </article>
+    </section>
+
+    <section class="app-shell hidden" id="appShell">
+      <header class="topbar panel">
+        <div class="brand-row">
+          <div class="brand-mark">S</div>
+          <div>
+            <p class="eyebrow">Student workspace</p>
+            <h1>Smart Student Task & Notes Manager</h1>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="user-pill" id="userName">Student</span>
+          <button type="button" class="secondary-btn" id="notificationBtn">Enable reminders</button>
+          <button type="button" class="secondary-btn danger-ghost" id="logoutButton">Log out</button>
+        </div>
+      </header>
+
+      <main class="main-panel">
+        <section class="stats-grid" id="statsGrid">
+          <article class="stat-card">
+            <span>Active tasks</span>
+            <strong id="activeTasks">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Due soon</span>
+            <strong id="dueSoon">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Notes saved</span>
+            <strong id="noteCount">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Completion</span>
+            <strong id="completionRate">0%</strong>
+          </article>
+        </section>
+
+        <section class="panel smart-panel">
+          <div>
+            <p class="eyebrow">Daily insight</p>
+            <h2>What should you do next?</h2>
+          </div>
+          <div id="insightList" class="insight-list"></div>
+        </section>
+
+        <section class="workspace-grid calendar-grid">
+          <article class="panel calendar-panel">
+            <div class="panel-head wrap-head">
+              <div>
+                <p class="eyebrow">Calendar</p>
+                <h2>Deadline map</h2>
+              </div>
+              <div class="calendar-controls">
+                <button type="button" class="secondary-btn" id="prevMonthButton">Prev</button>
+                <strong id="monthLabel"></strong>
+                <button type="button" class="secondary-btn" id="nextMonthButton">Next</button>
+              </div>
+            </div>
+            <div class="weekday-row">
+              <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+            </div>
+            <div id="calendarGrid" class="calendar-grid-days"></div>
+          </article>
+
+          <article class="panel reminders-panel">
+            <div class="panel-head wrap-head">
+              <div>
+                <p class="eyebrow">Reminders</p>
+                <h2>Upcoming alerts</h2>
+              </div>
+            </div>
+            <div id="reminderList" class="stack-list"></div>
+          </article>
+        </section>
+
+        <section class="workspace-grid" id="tasks">
+          <article class="panel form-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Assignments</p>
+                <h2>Add a task</h2>
+              </div>
+            </div>
+            <form id="taskForm" class="form-grid">
+              <label>
+                Title
+                <input type="text" name="title" placeholder="Submit physics lab" required />
+              </label>
+              <label>
+                Course
+                <input type="text" name="course" placeholder="Physics" />
+              </label>
+              <label>
+                Due date
+                <input type="date" name="dueDate" />
+              </label>
+              <label>
+                Priority
+                <select name="priority">
+                  <option value="high">High</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </label>
+              <label>
+                Status
+                <select name="status">
+                  <option value="pending" selected>Pending</option>
+                  <option value="in-progress">In progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </label>
+              <label>
+                Reference link (optional)
+                <input type="url" name="link" placeholder="https://..." />
+              </label>
+              <label class="full-span">
+                Notes
+                <textarea name="notes" rows="3" placeholder="Break the task into smaller parts..."></textarea>
+              </label>
+              <button class="primary-btn full-span" type="submit">Save task</button>
+            </form>
+          </article>
+
+          <article class="panel list-panel">
+            <div class="panel-head wrap-head">
+              <div>
+                <p class="eyebrow">Task board</p>
+                <h2>Upcoming work</h2>
+              </div>
+              <div class="filters">
+                <input id="taskSearch" type="search" placeholder="Search tasks" />
+                <select id="statusFilter">
+                  <option value="all">All status</option>
+                  <option value="pending">Pending</option>
+                  <option value="in-progress">In progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+            </div>
+            <div id="taskList" class="stack-list"></div>
+          </article>
+        </section>
+
+        <section class="workspace-grid notes-grid" id="notes">
+          <article class="panel form-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Study notes</p>
+                <h2>Create a note</h2>
+              </div>
+            </div>
+            <form id="noteForm" class="form-grid">
+              <label>
+                Title
+                <input type="text" name="title" placeholder="Chapter 4 summary" required />
+              </label>
+              <label>
+                Subject
+                <input type="text" name="subject" placeholder="Chemistry" />
+              </label>
+              <label class="full-span">
+                Content
+                <textarea name="content" rows="5" placeholder="Write class notes, formulas, reminders..."></textarea>
+              </label>
+              <label class="full-span">
+                Reference link (optional)
+                <input type="url" name="link" placeholder="https://..." />
+              </label>
+              <label class="checkline full-span">
+                <input type="checkbox" name="pinned" />
+                Pin this note
+              </label>
+              <button class="primary-btn full-span" type="submit">Save note</button>
+            </form>
+          </article>
+
+          <article class="panel list-panel">
+            <div class="panel-head wrap-head">
+              <div>
+                <p class="eyebrow">Notebook</p>
+                <h2>Saved notes</h2>
+              </div>
+              <div class="filters">
+                <input id="noteSearch" type="search" placeholder="Search notes" />
+                <select id="noteSort">
+                  <option value="recent">Recent</option>
+                  <option value="pinned">Pinned first</option>
+                </select>
+              </div>
+            </div>
+            <div id="noteList" class="stack-list"></div>
+          </article>
+        </section>
+      </main>
+    </section>
+
+    <template id="taskTemplate">
+      <article class="item-card">
+        <div class="item-main">
+          <div class="item-topline">
+            <h3></h3>
+            <span class="badge"></span>
+          </div>
+          <p class="meta-line"></p>
+          <p class="body-copy"></p>
+          <a class="resource-link" target="_blank" rel="noreferrer">Open link</a>
+        </div>
+        <div class="item-actions">
+          <button type="button" data-action="toggle-status"></button>
+          <button type="button" data-action="edit">Edit</button>
+          <button type="button" data-action="delete" class="danger">Delete</button>
+        </div>
+      </article>
+    </template>
+
+    <template id="noteTemplate">
+      <article class="item-card note-card">
+        <div class="item-main">
+          <div class="item-topline">
+            <h3></h3>
+            <span class="badge"></span>
+          </div>
+          <p class="meta-line"></p>
+          <p class="body-copy note-content"></p>
+          <a class="resource-link" target="_blank" rel="noreferrer">Open link</a>
+        </div>
+        <div class="item-actions">
+          <button type="button" data-action="toggle-pin"></button>
+          <button type="button" data-action="edit">Edit</button>
+          <button type="button" data-action="delete" class="danger">Delete</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+    <template id="taskTemplate">
+      <article class="item-card">
+        <div class="item-main">
+          <div class="item-topline">
+            <h3></h3>
+            <span class="badge"></span>
+          </div>
+          <p class="meta-line"></p>
+          <p class="body-copy"></p>
+          <a class="resource-link" target="_blank" rel="noreferrer">Open link</a>
+        </div>
+        <div class="item-actions">
+          <button type="button" data-action="toggle-status"></button>
+          <button type="button" data-action="edit">Edit</button>
+          <button type="button" data-action="delete" class="danger">Delete</button>
+        </div>
+      </article>
+    </template>
+
+    <template id="noteTemplate">
+      <article class="item-card note-card">
+        <div class="item-main">
+          <div class="item-topline">
+            <h3></h3>
+            <span class="badge"></span>
+          </div>
+          <p class="meta-line"></p>
+          <p class="body-copy note-content"></p>
+          <a class="resource-link" target="_blank" rel="noreferrer">Open link</a>
+        </div>
+        <div class="item-actions">
+          <button type="button" data-action="toggle-pin"></button>
+          <button type="button" data-action="edit">Edit</button>
+          <button type="button" data-action="delete" class="danger">Delete</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>
