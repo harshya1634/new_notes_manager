@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Smart Student Task & Notes Manager
 
 A Flask and SQLite student productivity web app for managing assignments, notes, calendar deadlines, and reminder alerts in one place.
@@ -33,3 +34,7 @@ python app.py
 ```
 
 4. Open `http://127.0.0.1:5000`
+=======
+# notessss
+students notes manager
+>>>>>>> 34d8af6dfd1e9dcfc5b19b36f2e5a55b13cceebe
